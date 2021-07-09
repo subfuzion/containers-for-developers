@@ -2,10 +2,14 @@
 
 This is going to be a rapid orientation to software containerization through a series of examples.
 
+{% hint style="info" %}
+This series of examples get progressively more complicated. Explanations that are provided in earlier examples are not repeated in later ones. For this reason, you are encouraged to step through this guide in order.
+{% endhint %}
+
 The only assumptions are that you are a software developer with a basic familiarity using a bash shell in a terminal and that your environment has the following software installed to get through most of this guide:
 
 * [Docker](https://docs.docker.com/get-docker/)
-* curl \([Windows](https://curl.se/windows/); probably already pre-installed on [Linux](https://curl.se/download.html) and [macOS](https://formulae.brew.sh/formula/curl)\)
+* curl \(for [Windows](https://curl.se/windows/); probably already pre-installed on [Linux](https://curl.se/download.html) and [macOS](https://formulae.brew.sh/formula/curl)\)
 
 {% hint style="info" %}
 If you don't want to install these tools on your own machine, then you can use [Google Cloud Shell](https://cloud.google.com/shell). It provides a cloud-hosted environment that has all the tools you'll need already installed.

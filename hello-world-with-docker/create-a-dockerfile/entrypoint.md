@@ -4,54 +4,45 @@ description: Dockerfile - line 3
 
 # ENTRYPOINT
 
-#### Dockerfile line 3
-
-`FROM alpine`
-
-This instruction tells Docker to use [alpine](https://hub.docker.com/_/alpine) as the base image for the image you're going to create. The base image provides a very lightweight distribution for Linux, called [Alpine](https://alpinelinux.org/).
-
-We need a Linux distribution because we want to run a script using the Bourne shell \(`sh`\). Docker only uses the host Linux kernel, so if your container needs anything else, you're responsible for ensuring the image provides it. The `alpine` image includes `/bin/sh`, which our script depends on to run.
-
-Although there are base images for all the major Linux distributions \(such as [debian](https://hub.docker.com/_/debian), [ubuntu](https://hub.docker.com/_/ubuntu), [centos](https://hub.docker.com/_/centos), etc\) that include `/bin/sh`, most of them include much more than what we need for such a simple program. Alpine Linux is often a good choice simple utilities and even some production applications.
-
-#### Line 2
-
-`COPY hello.sh /`
-
-This instruction tells Docker to copy a file \(or files\) from **host** file system \(which in this case is your machine's file system\) to the destination directory in the **container** file system.
-
-{% hint style="info" %}
-You can only copy files from the directory containing your Dockerfile and any of its subdirectories.
-
-You could have also written `/hello.sh` and this would still work since `hello.sh` is at the _root of your build context_, but making it look like an absolute path is confusing and unnecessary.
-{% endhint %}
-
-The **COPY** instruction can be used to **rename** the file. For example,
-
-`COPY hello.sh /app`
-
-would copy `hello.sh` to the root directory and rename it to `app`.
-
-The following does **not** rename the file, but instead copies it to the `/app` directory \(and creates the directory if it doesn't exist\):
-
-`COPY hello.sh /app/`
-
-You can copy to any arbitrary path \(and it will be created\) **and** rename the file:
-
-`COPY hello.sh /path/to/scripts/app.sh`
-
-Finally, you can copy to destination paths that are relative to the current working directory, as specified using the `WORKDIR` instruction.
-
 ```text
-WORKDIR /app
-COPY hello.sh .
+ENTRYPOINT [ "/hello.sh" ]
 ```
 
-The path for `WORKDIR` does not need to exist. The `WORKDIR` instruction is useful when you need to run a number of commands in a specific directory.
+The [ENTRYPOINT](https://docs.docker.com/engine/reference/builder/#entrypoint) instruction lets you configure a container that will run as as an executable. Every time you launch a container using this image, the container will run the program specified in `ENTRYPOINT`, and any options you provide when launching will be passed as arguments to the program.
 
-#### Line 3
+Any **mandatory** command-line arguments for the the process should be specified after the program name. If specified, mandatory arguments will **not** be overridden by any explicitly supplied arguments when launching a container using this image.
 
-`ENTRYPOINT [ "/hello.sh" ]`
+For example:
 
-The `ENTRYPOINT` instruction 
+{% tabs %}
+{% tab title="exec form" %}
+```text
+ENTRYPOINT ["executable", "param1", "param2"]
+```
+{% endtab %}
+
+{% tab title="shell form" %}
+```
+ENTRYPOINT command param1 param2
+```
+{% endtab %}
+{% endtabs %}
+
+{% hint style="info" %}
+Always use the **exec form**. There are significant disadvantages to using the **shell form**, discussed [here](https://docs.docker.com/engine/reference/builder/#entrypoint). In a nutshell, you want your process to run as PID 1 so that it can receive standard UNIX signals, particularly `SIGTERM`\(the conventional termination request signal\) and `SIGINT` \(triggered by `CTRL-C`\).
+{% endhint %}
+
+#### Optional arguments
+
+Any **optional** command-line arguments that you would like to supply to the `ENTRYPOINT` process **by default** should be added to a [CMD](https://docs.docker.com/engine/reference/builder/#cmd) instruction. These will be appended to the list of any of mandatory arguments you specify with the `ENTRYPOINT` instruction. **However**, optional arguments **will** be overridden by any explicitly supplied arguments when launching a container using this image.
+
+{% hint style="info" %}
+The **CMD** instruction can be used by itself, not just to augment the **ENTRYPOINT** instruction, but to replace it. This is useful for launching containers where it's desirable to run different processes bundled in the image.  
+  
+When used this way, the first argument  for the CMD instruction must be the program to run, not one of the program options.
+
+When launching a container, any supplied arguments will **replace** the entire CMD \(which, of course, means the first argument in this case must be the name of the program to run, followed by any other arguments\).
+{% endhint %}
+
+
 
